@@ -1,0 +1,149 @@
+"""Creating a user vs computer game of Rock, Paper, Scissors"""
+
+from random import randint
+from random import uniform
+from time import sleep
+import sys
+
+
+greet_msg = "Welcome to Rock, Paper, Scissors!"
+win_msg = "Congratulations, you win this round!"
+tie_msg = "It's a tie!"
+lose_msg = "Aw, you lose this round."
+
+
+def slow_type(string):
+    for char in string[::1]:
+        sys.stdout.write(char)
+        sys.stdout.flush()
+        sleep(uniform(0.2, 0.3))
+
+
+class Statistics(object):
+    def __init__(self, game_no, user_score, comp_score, tie_score, win_ratio):
+        self.game_no = game_no
+        self.user_score = user_score
+        self.comp_score = comp_score
+        self.tie_score = tie_score
+        self.win_ratio = win_ratio
+
+    def increment_user_win(self):
+        self.user_score += 1
+        self.game_no += 1
+
+    def increment_comp_win(self):
+        self.comp_score += 1
+        self.game_no += 1
+
+    def increment_tie(self):
+        self.tie_score += 1
+        self.game_no += 1
+
+    def get_ratio(self):
+        if self.user_score > 0 and self.comp_score > 0:
+            self.win_ratio = self.user_score / self.comp_score * 100
+        elif self.user_score == 0 and self.comp_score > 0:
+            self.win_ratio = 0
+        elif self.user_score > 0 and self.comp_score == 0:
+            self.win_ratio = 100
+
+    def print_stats(self):
+        print "\n"
+        print "-" * (len(name) + 15)
+        print " %s" % name + "'s Statistics"
+        print "-" * (len(name) + 15)
+        print "Games played: %d" % self.game_no
+        print "Wins: %d" % self.user_score
+        print "Losses: %d" % self.comp_score
+        print "Ties: %d" % self.tie_score
+        print "Win rate: %d" % self.win_ratio + "%"
+
+
+def get_winner(x, y):
+    if x == y:
+        return tie_msg
+    elif (x == "Rock" and y == "Scissors") or (x == "Scissors" and y == "Paper" or (x == "Paper" and y == "Rock")):
+        return win_msg
+    else:
+        return lose_msg
+
+
+def get_word(x):
+    if x == "R" or x == 1:
+        return " Rock"
+    elif x == "P" or x == 2:
+        return " Paper"
+    elif x == "S" or x == 3:
+        return " Scissors"
+
+
+stats = Statistics(0, 0, 0, 0, 0)
+
+
+"""------------stuff starts displaying from here-------------"""
+
+print greet_msg
+name = raw_input("What's your name? ").capitalize()
+print "Alright, %s, you know how it works, right? Rock beats scissors, scissors beat paper, paper beats rock. Let's" \
+       " see if you've got what it takes to beat the computer!" % name
+sleep(1)
+
+def play():
+    user_guess = raw_input("Guess [R]ock, [P]aper or [S]cissors: ").upper()
+    while user_guess not in "RPS" or len(user_guess) != 1:
+        user_guess = raw_input("I didn't catch that. Please enter R for rock, P for paper or S for scissors: ").upper()
+
+    comp_guess = randint(1, 3)
+    user_final = get_word(user_guess)
+    comp_final = get_word(comp_guess)
+
+    print "Your guess =" + user_final
+    sleep(1)
+    print "Computer guess =",
+    slow_type(comp_final)
+
+
+    print "\n"
+    sleep(0)
+
+    result = get_winner(user_final, comp_final)
+    print result
+
+    sleep(1)
+
+
+    if result == win_msg:
+        stats.increment_user_win()
+        stats.get_ratio()
+    elif result == lose_msg:
+        stats.increment_comp_win()
+        stats.get_ratio()
+    elif result == tie_msg:
+        stats.increment_tie()
+        stats.get_ratio()
+
+
+    print_stats = raw_input("Show statistics for [T]his session, [O]verall or [N]ot at all? ").upper()
+    if print_stats not in "TON" or len(print_stats) != 1:
+        print "I'll take that as a no!"
+    elif print_stats == "T":
+        stats.print_stats()
+    elif print_stats == "O":
+        print "I'm not clever enough to do that yet. Come back next week!"
+
+    print "\n"
+
+
+play()
+
+
+while True:
+    again = raw_input("Would you like to play again? Y/N: ").upper()
+    while again not in "YN" and len(again) != 1:
+        again = raw_input("I didn't catch that. Please enter Y for yes or N for no: ").upper()
+    if again == "Y":
+        play()
+    elif again == "N":
+        print "Thanks for playing, %s. Here are your final statistics for today: " % name
+        stats.print_stats()
+        break
